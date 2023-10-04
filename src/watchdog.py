@@ -14,36 +14,8 @@ def send_file_to_queue():
         }
 
         # Ensure that the message is published before returning
-        try:
-            # Ensure that the message is published before returning
-            channel.basic_publish(exchange='', routing_key="file_progress_queue", body=json.dumps(message))
-            print(f"Sent '{message}' for 3 Nights Splitting process")
-        except pika.exceptions.StreamLostError as e:
-            # Handle stream lost error gracefully
-            print(f"Stream connection lost: {e}")
-            reconnect()
-            channel.basic_publish(exchange='', routing_key="file_progress_queue", body=json.dumps(message))
-
-    def reconnect():
-        while True:
-            try:
-                # Attempt to establish a new connection
-                print("Reconnecting to RabbitMQ...")
-                connection = pika.BlockingConnection(pika.ConnectionParameters(os.environ['RABBITMQ_SERVER']))
-                channel = connection.channel()
-                channel.queue_declare(queue=queue_name)
-                channel.queue_purge(queue=queue_name)
-
-                channel.basic_qos(prefetch_count=1)
-
-                # Re-register the observer if reconnection is successful
-                observer.schedule(event_handler, path=os.environ['PortalDestination'], recursive=True)
-                print("Reconnection successful.")
-                break
-            except pika.exceptions.AMQPConnectionError:
-                # Handle connection error and retry
-                print("Failed to reconnect. Retrying in 5 seconds...")
-                time.sleep(5)
+        channel.basic_publish(exchange='', routing_key="file_progress_queue", body=json.dumps(message))
+        print(f"Sent '{message}' for 3 Nights Splitting process")
 
     class FileHandler(FileSystemEventHandler):
         def __init__(self):
