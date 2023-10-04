@@ -8,7 +8,16 @@ import threading
 
 
 if __name__ == "__main__":
-    consume_thread = threading.Thread(target=consumer.main)
-    consume_thread.start()
-    doggo_thread = threading.Thread(target=doggo.send_file_to_queue)
-    doggo_thread.start()  # Start watching the 'waiting_room' directory
+    # Create a RabbitMQ connection and channel for the consumer
+    creds = pika.PlainCredentials('guest', 'guest')
+    connection = pika.BlockingConnection(pika.ConnectionParameters('localhost', 5672, '/', creds))
+    channel = connection.channel()
+    
+    # Create the FileHandler and start the Watchdog
+    file_handler = doggo.FileHandler(channel)
+    observer = doggo.Observer()
+    observer.schedule(file_handler, path=os.environ['PortalDestination'], recursive=True)
+    observer.start()
+    
+    # Start the RabbitMQ consumer
+    consumer.main()

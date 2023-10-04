@@ -4,7 +4,13 @@ import time
 import os
 import src.functions.noxmultinight as SplitterService
 import datetime
-def process_file(message):
+import logging
+
+creds = pika.PlainCredentials('guest', 'guest')
+queue_name = 'file_progress_queue'
+# logger = logging.getLogger("consumer")
+
+def process_file(channel,message):
 
     file_path_zip = message['file_path_zip']
     centre = file_path_zip.split('\\')[-2]
@@ -22,32 +28,18 @@ def process_file(message):
     return Success, Message, Name
 
 def callback(ch, method, properties, body):
+    # logger.info(f"Received message: {body}")
     try:
         message = json.loads(body)
         print(f"Received file: {message}")
         name = message["name"]
         time = datetime.datetime.now()
         message["Time"] = time.isoformat()
-        ch.basic_publish(
-            exchange='',
-            routing_key=name,
-            properties=pika.BasicProperties(
-                correlation_id=properties.correlation_id
-            ),
-            body=json.dumps(message)
-        )
-        Success, Message, Name = process_file(message)
-        time = datetime.datetime.now()
-        message["Time"] = time.isoformat()
 
-        ch.basic_publish(
-            exchange='',
-            routing_key=name,
-            properties=pika.BasicProperties(
-                correlation_id=properties.correlation_id
-            ),
-            body=json.dumps(message)
-        )
+        Success, Message, Name = process_file(ch,message)
+        time = datetime.datetime.now()
+
+        message["Time"] = time.isoformat()
         if Success:
             print("Processing completed")
         else:
@@ -66,20 +58,19 @@ def callback(ch, method, properties, body):
     
 
 def main():
-    creds = pika.PlainCredentials('guest', 'guest')
-    queue_name = 'file_progress_queue'
-    connection = pika.BlockingConnection(pika.ConnectionParameters(os.environ['RABBITMQ_SERVER'], 5672, '/', creds, heartbeat=60*10))
+
+    connection = pika.BlockingConnection(pika.ConnectionParameters(os.environ['RABBITMQ_SERVER'], 
+                                                                   5672, '/', creds, heartbeat=60*10))
     channel = connection.channel()
 
     channel.queue_declare(queue=queue_name)
     channel.queue_purge(queue=queue_name)
-
+    
     channel.basic_qos(prefetch_count=1)
-    channel.basic_consume(queue=queue_name, on_message_callback=callback, auto_ack=False)
+    channel.basic_consume(queue=queue_name, on_message_callback=callback)
     
     print("Waiting for files. To exit, press CTRL+C")
     channel.start_consuming()
-    connection.close()
 
 if __name__ == "__main__":
     main()
