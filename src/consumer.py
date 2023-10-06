@@ -57,7 +57,7 @@ def callback(ch, method, properties, body):
 
     
 
-def main():
+def main(creds):
 
     connection = pika.BlockingConnection(pika.ConnectionParameters(os.environ['RABBITMQ_SERVER'], 
                                                                    5672, '/', creds, heartbeat=60*10))
@@ -72,5 +72,3 @@ def main():
     print("Waiting for files. To exit, press CTRL+C")
     channel.start_consuming()
 
-if __name__ == "__main__":
-    main()

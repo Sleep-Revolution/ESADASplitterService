@@ -20,4 +20,4 @@ if __name__ == "__main__":
     observer.start()
     
     # Start the RabbitMQ consumer
-    consumer.main()
+    consumer.main(creds)
