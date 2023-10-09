@@ -51,7 +51,7 @@ def process_file(channel,message):
 
     centreId = message['centreId']
     isDataset = message['dataset']
-    
+    uploadId = message['uploadId']
     path = message['path'] #centre name
     datasetName = '' if not isDataset else path
 
@@ -78,10 +78,13 @@ def process_file(channel,message):
 
     for subdir in os.listdir(projectLocation):
         print(subdir)
+        nightNumber = int(subdir[:-2])
         # move the subdir to the Individual night waiting room
+
         # notify the front end.
         # uploadId is used to connnect the night to a specific upload.
-        
+        requests.post(os.environ["FRONT_END_SERVER"] + f"/{uploadId}/{nightNumber}")
+        # @app.post("/add-night-to-upload/{uploadId}/{nightNumber}")
 
 
     print("Ending night splitting process")
@@ -121,7 +124,7 @@ def callback(ch, method, properties, body):
     # except Exception as e:
         # Handle any exceptions that occur during processing
         # print(f"Error processing message: {str(e)}")
-    
+
 
 
     ch.basic_ack(delivery_tag=method.delivery_tag)
