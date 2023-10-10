@@ -16,24 +16,29 @@ class STATUS_MESSAGES:
     WARN = 3
 
 class ProgressMessage:
-    def __init__(self, stepNumber:int, taskTitle:str, progress:int, message:str="", fileName: str="", centreId:int=None, datasetName:str=None):
+    def __init__(self, stepNumber:int, taskTitle:str, progress:int, message:str="", fileName: str="", uploadId:int=None, datasetName:str=None):
         self.StepNumber = stepNumber
         self.TaskTitle = taskTitle
         self.Progress = progress
         self.FileName = fileName
         self.Message = message
-        self.CentreId = centreId
+        self.UploadID = uploadId
         self.DatasetName = datasetName
     def serialise(self) -> dict: 
         return {
-            'CentreId': self.CentreId,
-            'FileName': self.FileName,
+            'UploadId': self.UploadID,
             'StepNumber': self.StepNumber,
             'TaskTitle': self.TaskTitle,
             'Progress': self.Progress,
             'Message': self.Message,
             'DatasetName': self.DatasetName
         }
+    # UploadId: str
+    # StepNumber: int
+    # TaskTitle: str
+    # Progress: int
+    # Message: str
+    # DatasetName: str
 
 
 creds = pika.PlainCredentials('server', 'server')
@@ -60,8 +65,8 @@ def process_file(channel,message):
 
 
     def basicpublish(status=-2, message=""):
-        url = f"{os.environ['FRONT_END_SERVER']}/meta/log"
-        entry = ProgressMessage(step, task, status, message, name, centreId, datasetName=datasetName)
+        url = f"{os.environ['FRONT_END_SERVER']}/meta/log_upload"
+        entry = ProgressMessage(step, task, status, message, name, uploadId, datasetName=datasetName)
         print(entry.serialise())
         r = requests.post(url, json=entry.serialise())
 
@@ -72,21 +77,22 @@ def process_file(channel,message):
     name = message["name"]
     esr = name[:-4]
     step = 0 
-    task = 'Convert To EDF'
+    task = 'Split upload'
     basicpublish(status=STATUS_MESSAGES.STARTED)
     Success, Message, Name = SplitterService.NoxSplitting(path_to_zip, esr, projectLocation)
 
     for subdir in os.listdir(projectLocation):
         print(subdir)
-        nightNumber = int(subdir[:-2])
+        nightNumber = int(subdir[-2])
         # move the subdir to the Individual night waiting room
 
         # notify the front end.
         # uploadId is used to connnect the night to a specific upload.
-        requests.post(os.environ["FRONT_END_SERVER"] + f"/{uploadId}/{nightNumber}")
+        requests.post(f"{os.environ['FRONT_END_SERVER']}/add-night-to-upload/{uploadId}/{nightNumber}")
         # @app.post("/add-night-to-upload/{uploadId}/{nightNumber}")
+        
 
-
+    basicpublish(status=STATUS_MESSAGES.FINISHED, message=f"Recording was split into {len(os.listdir(projectLocation))}")
     print("Ending night splitting process")
 
     # delete the project location. 
