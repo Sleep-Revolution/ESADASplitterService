@@ -7,6 +7,7 @@ import datetime
 import logging
 import uuid
 import requests
+import shutil
 
 class STATUS_MESSAGES:
     FAIL = -1
@@ -85,10 +86,12 @@ def process_file(channel,message):
         print(subdir)
         nightNumber = int(subdir[-2])
         # move the subdir to the Individual night waiting room
-
+        shutil.copytree(os.path.join(projectLocation,subdir), 
+                                os.path.join(os.environ['INDIVIDUAL_NIGHTS_WAITING_ROOM'], uploadId, nightNumber))
         # notify the front end.
         # uploadId is used to connnect the night to a specific upload.
         requests.post(f"{os.environ['FRONT_END_SERVER']}/add-night-to-upload/{uploadId}/{nightNumber}")
+        os.rmdir(os.path.join(projectLocation,subdir))
         # @app.post("/add-night-to-upload/{uploadId}/{nightNumber}")
         
 
