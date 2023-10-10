@@ -84,7 +84,7 @@ def process_file(channel,message):
 
     for subdir in os.listdir(projectLocation):
         print(subdir)
-        nightNumber = int(subdir[-2])
+        nightNumber = int(subdir[-2:])
         # move the subdir to the Individual night waiting room
         shutil.copytree(os.path.join(projectLocation,subdir), 
                                 os.path.join(os.environ['INDIVIDUAL_NIGHTS_WAITING_ROOM'], uploadId, nightNumber))
@@ -93,7 +93,7 @@ def process_file(channel,message):
         requests.post(f"{os.environ['FRONT_END_SERVER']}/add-night-to-upload/{uploadId}/{nightNumber}")
         os.rmdir(os.path.join(projectLocation,subdir))
         # @app.post("/add-night-to-upload/{uploadId}/{nightNumber}")
-        
+
 
     basicpublish(status=STATUS_MESSAGES.FINISHED, message=f"Recording was split into {len(os.listdir(projectLocation))}")
     print("Ending night splitting process")
