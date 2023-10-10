@@ -83,14 +83,14 @@ def process_file(channel,message):
 
     for subdir in os.listdir(projectLocation):
         print(subdir)
-        nightNumber = int(subdir[-2])
+        nightNumber = int(subdir[-2:])
         # move the subdir to the Individual night waiting room
 
         # notify the front end.
         # uploadId is used to connnect the night to a specific upload.
         requests.post(f"{os.environ['FRONT_END_SERVER']}/add-night-to-upload/{uploadId}/{nightNumber}")
         # @app.post("/add-night-to-upload/{uploadId}/{nightNumber}")
-        
+
 
     basicpublish(status=STATUS_MESSAGES.FINISHED, message=f"Recording was split into {len(os.listdir(projectLocation))}")
     print("Ending night splitting process")
