@@ -1,10 +1,8 @@
 import pika
 import json
-import time
 import os
 import src.noxmultinight as SplitterService
 import datetime
-import logging
 import uuid
 import requests
 import shutil
@@ -85,13 +83,16 @@ def process_file(channel,message):
     for subdir in os.listdir(projectLocation):
         print(subdir)
         nightNumber = int(subdir[-2:])
+
+        destination = os.path.join(os.environ['INDIVIDUAL_NIGHT_WAITING_ROOM'], path, subdir)
         # move the subdir to the Individual night waiting room
-        shutil.copytree(os.path.join(projectLocation,subdir), 
-                                os.path.join(os.environ['INDIVIDUAL_NIGHTS_WAITING_ROOM'], uploadId, nightNumber))
+        if os.path.isdir(destination):
+            shutil.rmtree(destination)
+        shutil.copytree(os.path.join(projectLocation,subdir), destination)
         # notify the front end.
         # uploadId is used to connnect the night to a specific upload.
         requests.post(f"{os.environ['FRONT_END_SERVER']}/add-night-to-upload/{uploadId}/{nightNumber}")
-        os.rmdir(os.path.join(projectLocation,subdir))
+        shutil.rmtree(os.path.join(projectLocation,subdir))
         # @app.post("/add-night-to-upload/{uploadId}/{nightNumber}")
 
 
@@ -99,7 +100,8 @@ def process_file(channel,message):
     print("Ending night splitting process")
 
     # delete the project location. 
-
+    shutil.rmtree(os.path.join(projectLocation))
+        
     return Success, Message, Name
 
 
