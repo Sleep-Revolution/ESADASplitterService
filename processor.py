@@ -1,3 +1,4 @@
+print("Fuk")
 import pika
 import json
 import os
