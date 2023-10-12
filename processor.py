@@ -146,6 +146,7 @@ def callback(ch, method, properties, body):
 
 
 if __name__ == '__main__':
+    print("Yahoo?")
     connection = pika.BlockingConnection(pika.ConnectionParameters(os.environ['RABBITMQ_SERVER'], 5672, '/', creds, heartbeat=60*10))
     channel = connection.channel()
 
