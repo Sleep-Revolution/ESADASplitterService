@@ -1,4 +1,4 @@
-print("Fuk")
+print("Fuk", flush=True)
 import pika
 import json
 import os
@@ -145,9 +145,8 @@ def callback(ch, method, properties, body):
 
     
 
-
 if __name__ == '__main__':
-    print("Yahoo?")
+    print("Yahoo?", flush=True)
     connection = pika.BlockingConnection(pika.ConnectionParameters(os.environ['RABBITMQ_SERVER'], 5672, '/', creds, heartbeat=60*10))
     channel = connection.channel()
 
@@ -157,6 +156,6 @@ if __name__ == '__main__':
     channel.basic_qos(prefetch_count=1)
     channel.basic_consume(queue=os.environ['SPLITTER_QUEUE_NAME'], on_message_callback=callback)
 
-    print("Waiting for files. To exit, press CTRL+C")
+    print("Waiting for files. To exit, press CTRL+C", flush=True)
     channel.start_consuming()
 
