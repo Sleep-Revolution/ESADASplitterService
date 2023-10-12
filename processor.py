@@ -145,15 +145,16 @@ def callback(ch, method, properties, body):
     
 
 
-connection = pika.BlockingConnection(pika.ConnectionParameters(os.environ['RABBITMQ_SERVER'], 5672, '/', creds, heartbeat=60*10))
-channel = connection.channel()
+if __name__ == '__main__':
+    connection = pika.BlockingConnection(pika.ConnectionParameters(os.environ['RABBITMQ_SERVER'], 5672, '/', creds, heartbeat=60*10))
+    channel = connection.channel()
 
-channel.queue_declare(queue=os.environ['SPLITTER_QUEUE_NAME'], durable=True)
-# channel.queue_purge(queue=queue_name)
+    channel.queue_declare(queue=os.environ['SPLITTER_QUEUE_NAME'], durable=True)
+    # channel.queue_purge(queue=queue_name)
 
-channel.basic_qos(prefetch_count=1)
-channel.basic_consume(queue=os.environ['SPLITTER_QUEUE_NAME'], on_message_callback=callback)
+    channel.basic_qos(prefetch_count=1)
+    channel.basic_consume(queue=os.environ['SPLITTER_QUEUE_NAME'], on_message_callback=callback)
 
-print("Waiting for files. To exit, press CTRL+C")
-channel.start_consuming()
+    print("Waiting for files. To exit, press CTRL+C")
+    channel.start_consuming()
 
