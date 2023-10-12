@@ -46,7 +46,7 @@ creds = pika.PlainCredentials('server', 'server')
 #logger = logging.getLogger("consumer")
 
 def process_file(channel,message): 
-    print(message)
+    print(message, flush=True)
     path_to_zip = os.path.join(os.environ['PORTAL_DESTINATION_FOLDER'], message['path'], message['name'])
 
     projectName = str(uuid.uuid4())
@@ -117,7 +117,7 @@ def callback(ch, method, properties, body):
     message = json.loads(body)
     # {"name": "BJEMSLEV0316.zip", "path": "EmilSRE", "dataset": false, "centreId": 3, "uploadId": 82}
 
-    print(f"Received file: {message}")
+    print(f"Received file: {message}", flush=True)
     
     time = datetime.datetime.now()
     message["Time"] = time.isoformat()
@@ -127,9 +127,9 @@ def callback(ch, method, properties, body):
     
     message["Time"] = time.isoformat()
     if Success:
-        print("Processing completed")
+        print("Processing completed", flush=True)
     else:
-        print(f"Processing failed: {Message}")
+        print(f"Processing failed: {Message}", flush=True)
 
         # Acknowledge the message using the delivery tag
         
