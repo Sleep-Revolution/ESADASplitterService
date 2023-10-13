@@ -80,7 +80,7 @@ def process_file(channel,message):
     task = 'Split upload'
     basicpublish(status=STATUS_MESSAGES.STARTED)
     Success, Message, Name = SplitterService.NoxSplitting(path_to_zip, esr, projectLocation)
-
+    numRecordings = len(os.listdir(projectLocation))
     for subdir in os.listdir(projectLocation):
         print(subdir)
         nightNumber = int(subdir[-2:])
@@ -97,7 +97,7 @@ def process_file(channel,message):
         # @app.post("/add-night-to-upload/{uploadId}/{nightNumber}")
 
 
-    basicpublish(status=STATUS_MESSAGES.FINISHED, message=f"Recording was split into {len(os.listdir(projectLocation))}")
+    basicpublish(status=STATUS_MESSAGES.FINISHED, message=f"Recording was split into {numRecordings} nights.")
     print("Ending night splitting process")
 
     # delete the project location. 
