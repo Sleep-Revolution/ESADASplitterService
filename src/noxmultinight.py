@@ -39,7 +39,7 @@ def NoxSplitting(file_path_zip, esr, Destination):
         for root, file_path in zip(list_of_dir,zip_ref.infolist()):
             if root != '':
                 file_path.filename = PurePath(file_path.filename).name
-                zip_ref.extract(file_path, os.path.join(Destination, esr + str(int(root)+1).zfill(2)))
+                zip_ref.extract(file_path, os.path.join(Destination, esr + '-' + str(int(root)+1).zfill(2)))
 
     print(f"Zip file contents extracted to: {Destination}")
 

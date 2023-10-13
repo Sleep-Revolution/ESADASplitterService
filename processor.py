@@ -61,7 +61,7 @@ def process_file(channel,message):
     datasetName = '' if not isDataset else path
 
     if not os.path.exists(path_to_zip):
-        raise Exception(f"Got a message for a file for centre bla, but no folder exists in portal waiting room ({path_to_zip}).")
+        raise Exception(f"Got a message for a file for centre {centreId}, but no folder exists in portal waiting room ({path_to_zip}).")
 
 
     def basicpublish(status=-2, message=""):
