@@ -22,7 +22,7 @@ def NoxSplitting(file_path_zip, esr, Destination):
     print(f"Process ending after {datetime.datetime.now()-t}")
 
     if(r.status_code != 200):
-        return False, f"Failed to run NOX splitter {dir}, (status code {r.status_code} ) Error: {r.text}", ""
+        return False, f"Failed to run NOX splitter for {file_path_zip}, (status code {r.status_code} ) Error: {r.text}", ""
 
     # try:
     # Save the received zip file content to a temporary file
