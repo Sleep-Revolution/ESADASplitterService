@@ -80,6 +80,11 @@ def process_file(channel,message):
     task = 'Split upload'
     basicpublish(status=STATUS_MESSAGES.STARTED)
     Success, Message, Name = SplitterService.NoxSplitting(path_to_zip, esr, projectLocation)
+
+    if(not Success):
+        basicpublish(status=STATUS_MESSAGES.FAIL, message=Message)
+        return Success, Message, Name
+
     numRecordings = len(os.listdir(projectLocation))
     for subdir in os.listdir(projectLocation):
         print(subdir)

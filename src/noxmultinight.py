@@ -21,6 +21,8 @@ def NoxSplitting(file_path_zip, esr, Destination):
     r = requests.post(os.environ["NOX_3NSplitting_SERVICE"], headers=headers, files=files, timeout=1000)
     print(f"Process ending after {datetime.datetime.now()-t}")
 
+    if(r.status_code != 200):
+        return False, f"Failed to run NOX splitter {dir}, (status code {r.status_code} ) Error: {r.text}", ""
 
     # try:
     # Save the received zip file content to a temporary file
@@ -28,18 +30,23 @@ def NoxSplitting(file_path_zip, esr, Destination):
     with open(temp_zip_file, 'wb') as f:
         f.write(r.content)
 
-    # Extract the zip file contents to the extraction directory
-    with zipfile.ZipFile(temp_zip_file, 'r') as zip_ref:
-        list_of_dir = []
-        for i in zip_ref.infolist():
-            try:
-                list_of_dir.append(os.path.dirname(i.filename))
-            except:
-                list_of_dir.append('')
-        for root, file_path in zip(list_of_dir,zip_ref.infolist()):
-            if root != '':
-                file_path.filename = PurePath(file_path.filename).name
-                zip_ref.extract(file_path, os.path.join(Destination, esr + '-' + str(int(root)+1).zfill(2)))
+    try:
+        # Extract the zip file contents to the extraction directory
+        with zipfile.ZipFile(temp_zip_file, 'r') as zip_ref:
+            list_of_dir = []
+            for i in zip_ref.infolist():
+                try:
+                    list_of_dir.append(os.path.dirname(i.filename))
+                except:
+                    list_of_dir.append('')
+            for root, file_path in zip(list_of_dir,zip_ref.infolist()):
+                if root != '':
+                    file_path.filename = PurePath(file_path.filename).name
+                    zip_ref.extract(file_path, os.path.join(Destination, esr + '-' + str(int(root)+1).zfill(2)))
+
+    except Exception as e:
+        return False, f"Failed to extract zip file contents, Error: {str(e)}", ""
+
 
     print(f"Zip file contents extracted to: {Destination}")
 
