@@ -136,8 +136,6 @@ def callback(ch, method, properties, body):
 
     ch.basic_ack(delivery_tag=method.delivery_tag)
 
-    print("Waiting for new files. To exit, press CTRL+C")
-
     
 
 if __name__ == '__main__':
