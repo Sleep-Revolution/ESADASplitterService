@@ -1,4 +1,3 @@
-print("Fuk", flush=True)
 import pika
 import json
 import os
@@ -33,12 +32,6 @@ class ProgressMessage:
             'Message': self.Message,
             'DatasetName': self.DatasetName
         }
-    # UploadId: str
-    # StepNumber: int
-    # TaskTitle: str
-    # Progress: int
-    # Message: str
-    # DatasetName: str
 
 
 creds = pika.PlainCredentials('server', 'server')
@@ -68,7 +61,8 @@ def process_file(channel,message):
         url = f"{os.environ['FRONT_END_SERVER']}/meta/log_upload"
         entry = ProgressMessage(step, task, status, message, name, uploadId, datasetName=datasetName)
         print(entry.serialise())
-        r = requests.post(url, json=entry.serialise())
+        r = requests.post(url, json=entry.serialise(), timeout=300)
+        
 
 
     print("Starting night splitting process")
@@ -99,7 +93,6 @@ def process_file(channel,message):
         # uploadId is used to connnect the night to a specific upload.
         requests.post(f"{os.environ['FRONT_END_SERVER']}/add-night-to-upload/{uploadId}/{nightNumber}")
         shutil.rmtree(os.path.join(projectLocation,subdir))
-        # @app.post("/add-night-to-upload/{uploadId}/{nightNumber}")
 
 
     basicpublish(status=STATUS_MESSAGES.FINISHED, message=f"Recording was split into {numRecordings} nights.")
@@ -117,10 +110,7 @@ def process_file(channel,message):
 
 
 def callback(ch, method, properties, body):
-    # logger.info(f"Received message: {body}")
-    # try:
     message = json.loads(body)
-    # {"name": "BJEMSLEV0316.zip", "path": "EmilSRE", "dataset": false, "centreId": 3, "uploadId": 82}
 
     print(f"Received file: {message}", flush=True)
     
@@ -151,12 +141,10 @@ def callback(ch, method, properties, body):
     
 
 if __name__ == '__main__':
-    print("Yahoo?", flush=True)
     connection = pika.BlockingConnection(pika.ConnectionParameters(os.environ['RABBITMQ_SERVER'], 5672, '/', creds, heartbeat=60*10))
     channel = connection.channel()
 
     channel.queue_declare(queue=os.environ['SPLITTER_QUEUE_NAME'], durable=True)
-    # channel.queue_purge(queue=queue_name)
 
     channel.basic_qos(prefetch_count=1)
     channel.basic_consume(queue=os.environ['SPLITTER_QUEUE_NAME'], on_message_callback=callback)
