@@ -61,7 +61,7 @@ def process_file(channel,message):
         url = f"{os.environ['FRONT_END_SERVER']}/meta/log_upload"
         entry = ProgressMessage(step, task, status, message, name, uploadId, datasetName=datasetName)
         print(entry.serialise())
-        r = requests.post(url, json=entry.serialise(), timeout=300)
+        r = requests.post(url, json=entry.serialise(), timeout=400)
         
 
 
