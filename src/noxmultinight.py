@@ -18,7 +18,7 @@ def NoxSplitting(file_path_zip, esr, Destination):
     files = {"file": open(file_path_zip, "rb")}
     t = datetime.datetime.now()
     print(f"Process starting on {datetime.datetime.now()}") 
-    r = requests.post(os.environ["NOX_3NSplitting_SERVICE"], headers=headers, files=files, timeout=1000)
+    r = requests.post(os.environ["NOX_3NSplitting_SERVICE"], headers=headers, files=files, timeout=2500)
     print(f"Process ending after {datetime.datetime.now()-t}")
 
     if(r.status_code != 200):
