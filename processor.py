@@ -6,7 +6,7 @@ import datetime
 import uuid
 import requests
 import shutil
-
+timeout = 500
 class STATUS_MESSAGES:
     FAIL = -1
     STARTED = 0
@@ -61,7 +61,7 @@ def process_file(channel,message):
         url = f"{os.environ['FRONT_END_SERVER']}/meta/log_upload"
         entry = ProgressMessage(step, task, status, message, name, uploadId, datasetName=datasetName)
         print(entry.serialise())
-        r = requests.post(url, json=entry.serialise(), timeout=400)
+        r = requests.post(url, json=entry.serialise(), timeout=timeout)
         
 
 
