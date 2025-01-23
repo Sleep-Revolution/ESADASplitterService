@@ -6,7 +6,7 @@ import datetime
 import zipfile
 import requests
 import json
-
+from requests.exceptions import ConnectionError, Timeout
 
 
 def NoxSplitting(file_path_zip, esr, Destination):
@@ -18,7 +18,24 @@ def NoxSplitting(file_path_zip, esr, Destination):
     files = {"file": open(file_path_zip, "rb")}
     t = datetime.datetime.now()
     print(f"Process starting on {datetime.datetime.now()}") 
-    r = requests.post(os.environ["NOX_3NSplitting_SERVICE"], headers=headers, files=files, timeout=2500)
+    #r = requests.post(os.environ["NOX_3NSplitting_SERVICE"], headers=headers, files=files, timeout=2500)
+
+    url = os.environ["NOX_3NSplitting_SERVICE"]
+    retries = 3
+    for attempt in range(retries):
+        try:
+            timeout = 500 + (500 * attempt)
+            r = requests.post(url, headers=headers, files=files, timeout=timeout)
+            if r.status_code == 200:
+                break
+        except (ConnectionError, Timeout) as e:
+            print(f"Attempt {attempt + 1} failed: {e}")
+            time.sleep(5 + (60 * attempt) )  # Wait before retrying
+            if attempt == 2:
+                return False, f"Failed to run NOX splitter for {file_path_zip}, ", ""
+
+
+    
     print(f"Process ending after {datetime.datetime.now()-t}")
 
     if(r.status_code != 200):
