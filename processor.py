@@ -5,7 +5,9 @@ import src.noxmultinight as SplitterService
 import datetime
 import uuid
 import requests
+import time
 import shutil
+
 timeout = 500
 class STATUS_MESSAGES:
     FAIL = -1
@@ -136,7 +138,9 @@ def callback(ch, method, properties, body):
 
     ch.basic_ack(delivery_tag=method.delivery_tag)
 
-    
+
+    print("Sleeping for two minutes as to not overload nox splitter")
+    time.sleep(120)
 
 if __name__ == '__main__':
     connection = pika.BlockingConnection(pika.ConnectionParameters(os.environ['RABBITMQ_SERVER'], 5672, '/', creds, heartbeat=60*10))
