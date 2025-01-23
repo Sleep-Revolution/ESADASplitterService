@@ -30,7 +30,9 @@ def NoxSplitting(file_path_zip, esr, Destination):
                 break
         except (ConnectionError, Timeout) as e:
             print(f"Attempt {attempt + 1} failed: {e}")
-            time.sleep(5 + (60 * attempt) )  # Wait before retrying
+            time_to_sleep = 5 + (60 * attempt)
+            print(f"Sleeping for {time_to_sleep} seconds before trying again")
+            time.sleep( time_to_sleep )  # Wait before retrying
             if attempt == 2:
                 return False, f"Failed to run NOX splitter for {file_path_zip}, ", ""
 
