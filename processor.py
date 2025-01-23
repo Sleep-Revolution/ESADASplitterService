@@ -116,13 +116,13 @@ def callback(ch, method, properties, body):
 
     print(f"Received file: {message}", flush=True)
     
-    time = datetime.datetime.now()
-    message["Time"] = time.isoformat()
+    _time = datetime.datetime.now()
+    message["Time"] = _time.isoformat()
 
     Success, Message, Name = process_file(ch,message)
-    time = datetime.datetime.now()
+    _time = datetime.datetime.now()
     
-    message["Time"] = time.isoformat()
+    message["Time"] = _time.isoformat()
     if Success:
         print("Processing completed", flush=True)
     else:
