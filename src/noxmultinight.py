@@ -32,10 +32,9 @@ def NoxSplitting(file_path_zip, esr, Destination):
             print(f"Attempt {attempt + 1} failed: {e}")
             time_to_sleep = 5 + (60 * attempt)
             print(f"Sleeping for {time_to_sleep} seconds before trying again")
-            time.sleep( time_to_sleep )  # Wait before retrying
             if attempt == 2:
                 return False, f"Failed to run NOX splitter for {file_path_zip}, ", ""
-
+            time.sleep( time_to_sleep )  # Wait before retrying
 
     
     print(f"Process ending after {datetime.datetime.now()-t}")
