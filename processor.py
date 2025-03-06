@@ -89,7 +89,7 @@ def process_file(channel,message):
         destination = os.path.join(os.environ['INDIVIDUAL_NIGHT_WAITING_ROOM'], path, subdir)
         # move the subdir to the Individual night waiting room
         if os.path.isdir(destination):
-            shutil.rmtree(destination)
+            shutil.rmtree(destination, ignore_errors=True)
         shutil.copytree(os.path.join(projectLocation,subdir), destination)
         # notify the front end.
         # uploadId is used to connnect the night to a specific upload.
